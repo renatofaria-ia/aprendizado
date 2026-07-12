@@ -1,0 +1,155 @@
+{
+  "id": "como-o-doceo-usa-o-profile",
+  "markdownPath": "lessons/2026-07-11 - como-o-doceo-usa-o-profile.md",
+  "htmlPath": "html/como-o-doceo-usa-o-profile.html",
+  "markdown": {
+    "direction": "TB"
+  },
+  "nodes": [
+    {
+      "id": "duvida",
+      "label": "Você traz uma dúvida",
+      "diagramLabel": "Dúvida",
+      "tone": "coral"
+    },
+    {
+      "id": "perfil",
+      "label": "Doceo consulta o perfil",
+      "diagramLabel": "Perfil",
+      "tone": "blue"
+    },
+    {
+      "id": "calibracao",
+      "label": "Escolhe profundidade e analogia",
+      "diagramLabel": "Calibração",
+      "tone": "green"
+    },
+    {
+      "id": "licao",
+      "label": "Gera a lição",
+      "diagramLabel": "Lição",
+      "tone": "ink"
+    },
+    {
+      "id": "feedback",
+      "label": "Você dá feedback",
+      "diagramLabel": "Feedback",
+      "tone": "coral"
+    },
+    {
+      "id": "mudou",
+      "label": "O perfil mudou?",
+      "diagramLabel": "Perfil mudou?",
+      "tone": "blue",
+      "shape": "decision"
+    },
+    {
+      "id": "atualiza",
+      "label": "Atualiza _profile.md",
+      "diagramLabel": "Atualiza perfil",
+      "tone": "green"
+    }
+  ],
+  "edges": [
+    {
+      "from": "duvida",
+      "to": "perfil"
+    },
+    {
+      "from": "perfil",
+      "to": "calibracao"
+    },
+    {
+      "from": "calibracao",
+      "to": "licao"
+    },
+    {
+      "from": "licao",
+      "to": "feedback"
+    },
+    {
+      "from": "feedback",
+      "to": "mudou"
+    },
+    {
+      "from": "mudou",
+      "to": "atualiza",
+      "label": "Sim"
+    },
+    {
+      "from": "mudou",
+      "to": "perfil",
+      "label": "Não"
+    },
+    {
+      "from": "atualiza",
+      "to": "perfil"
+    }
+  ],
+  "html": {
+    "title": "O perfil calibra antes da resposta",
+    "overview": {
+      "direction": "LR",
+      "nodes": [
+        "duvida",
+        "perfil",
+        "calibracao",
+        "licao",
+        "feedback"
+      ],
+      "edges": [
+        {
+          "from": "duvida",
+          "to": "perfil"
+        },
+        {
+          "from": "perfil",
+          "to": "calibracao"
+        },
+        {
+          "from": "calibracao",
+          "to": "licao"
+        },
+        {
+          "from": "licao",
+          "to": "feedback"
+        }
+      ]
+    },
+    "caption": "Antes de responder, o Doceo usa o que já sabe sobre você para escolher a profundidade, a analogia e o próximo passo.",
+    "details": [
+      {
+        "id": "atualizacao-do-perfil",
+        "summary": "Quando o _profile.md é atualizado?",
+        "description": "Só quando o feedback confirma uma nova preferência, uma lacuna corrigida ou um conhecimento consolidado.",
+        "direction": "TB",
+        "nodes": [
+          "feedback",
+          "mudou",
+          "atualiza",
+          "perfil"
+        ],
+        "edges": [
+          {
+            "from": "feedback",
+            "to": "mudou"
+          },
+          {
+            "from": "mudou",
+            "to": "atualiza",
+            "label": "Sim"
+          },
+          {
+            "from": "mudou",
+            "to": "perfil",
+            "label": "Não"
+          },
+          {
+            "from": "atualiza",
+            "to": "perfil"
+          }
+        ]
+      }
+    ]
+  }
+}

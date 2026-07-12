@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Artefatos locais do editor e do sistema
+.DS_Store
+Thumbs.db

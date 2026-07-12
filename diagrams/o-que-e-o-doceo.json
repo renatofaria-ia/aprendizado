@@ -1,0 +1,100 @@
+{
+  "id": "o-que-e-o-doceo",
+  "markdownPath": "lessons/2026-07-11 - o-que-e-o-doceo.md",
+  "htmlPath": "html/o-que-e-o-doceo.html",
+  "markdown": {
+    "direction": "LR"
+  },
+  "nodes": [
+    {
+      "id": "pergunta",
+      "label": "Você traz uma dúvida",
+      "diagramLabel": "Pergunta",
+      "tone": "coral"
+    },
+    {
+      "id": "contexto",
+      "label": "Doceo lê seu contexto",
+      "diagramLabel": "Contexto",
+      "tone": "blue"
+    },
+    {
+      "id": "licao",
+      "label": "Entrega uma lição visual",
+      "diagramLabel": "Lição",
+      "tone": "green"
+    },
+    {
+      "id": "memoria",
+      "label": "Salva nota e página HTML",
+      "diagramLabel": "Memória",
+      "tone": "ink"
+    },
+    {
+      "id": "feedback",
+      "label": "Você dá feedback",
+      "diagramLabel": "Feedback",
+      "tone": "coral"
+    }
+  ],
+  "edges": [
+    {
+      "from": "pergunta",
+      "to": "contexto"
+    },
+    {
+      "from": "contexto",
+      "to": "licao"
+    },
+    {
+      "from": "licao",
+      "to": "memoria"
+    },
+    {
+      "from": "memoria",
+      "to": "feedback"
+    },
+    {
+      "from": "feedback",
+      "to": "contexto",
+      "label": "ajusta"
+    }
+  ],
+  "html": {
+    "title": "Da pergunta à memória",
+    "overview": {
+      "direction": "LR",
+      "nodes": [
+        "pergunta",
+        "contexto",
+        "licao",
+        "memoria",
+        "feedback"
+      ],
+      "edges": [
+        {
+          "from": "pergunta",
+          "to": "contexto"
+        },
+        {
+          "from": "contexto",
+          "to": "licao"
+        },
+        {
+          "from": "licao",
+          "to": "memoria"
+        },
+        {
+          "from": "memoria",
+          "to": "feedback"
+        },
+        {
+          "from": "feedback",
+          "to": "contexto",
+          "label": "ajusta"
+        }
+      ]
+    },
+    "caption": "O Doceo transforma uma pergunta em uma lição reutilizável e usa o feedback para calibrar o próximo ciclo."
+  }
+}

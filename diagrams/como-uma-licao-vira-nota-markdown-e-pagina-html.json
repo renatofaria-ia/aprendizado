@@ -1,0 +1,126 @@
+{
+  "id": "como-uma-licao-vira-nota-markdown-e-pagina-html",
+  "markdownPath": "lessons/2026-07-11 - como-uma-licao-vira-nota-markdown-e-pagina-html.md",
+  "htmlPath": "html/como-uma-licao-vira-nota-markdown-e-pagina-html.html",
+  "markdown": {
+    "direction": "LR"
+  },
+  "nodes": [
+    {
+      "id": "licao",
+      "label": "Lção pronta",
+      "tone": "coral"
+    },
+    {
+      "id": "md",
+      "label": "Nota Markdown",
+      "tone": "blue"
+    },
+    {
+      "id": "html",
+      "label": "Página HTML",
+      "tone": "ink"
+    },
+    {
+      "id": "index",
+      "label": "index.md / maps",
+      "tone": "green"
+    },
+    {
+      "id": "leitura",
+      "label": "Leitura / apresentação",
+      "tone": "blue"
+    },
+    {
+      "id": "feedback",
+      "label": "Feedback",
+      "tone": "coral"
+    },
+    {
+      "id": "learnings",
+      "label": "_learnings.md",
+      "tone": "green"
+    }
+  ],
+  "edges": [
+    {
+      "from": "licao",
+      "to": "md"
+    },
+    {
+      "from": "licao",
+      "to": "html"
+    },
+    {
+      "from": "md",
+      "to": "index"
+    },
+    {
+      "from": "html",
+      "to": "leitura"
+    },
+    {
+      "from": "leitura",
+      "to": "feedback"
+    },
+    {
+      "from": "feedback",
+      "to": "learnings"
+    }
+  ],
+  "html": {
+    "title": "Da lição aos artefatos",
+    "overview": {
+      "direction": "LR",
+      "nodes": [
+        "licao",
+        "md",
+        "html",
+        "index",
+        "leitura"
+      ],
+      "edges": [
+        {
+          "from": "licao",
+          "to": "md"
+        },
+        {
+          "from": "licao",
+          "to": "html"
+        },
+        {
+          "from": "md",
+          "to": "index"
+        },
+        {
+          "from": "html",
+          "to": "leitura"
+        }
+      ]
+    },
+    "details": [
+      {
+        "id": "retorno",
+        "summary": "Como a leitura vira melhoria",
+        "description": "O feedback nasce do uso da página e atualiza as regras de ensino para a próxima lição.",
+        "direction": "LR",
+        "nodes": [
+          "leitura",
+          "feedback",
+          "learnings"
+        ],
+        "edges": [
+          {
+            "from": "leitura",
+            "to": "feedback"
+          },
+          {
+            "from": "feedback",
+            "to": "learnings"
+          }
+        ]
+      }
+    ],
+    "caption": "A mesma lição gera memória em Markdown e leitura em HTML. O uso da página produz feedback, e o feedback melhora as regras seguintes."
+  }
+}

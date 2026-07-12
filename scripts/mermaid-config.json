@@ -1,0 +1,23 @@
+{
+  "theme": "base",
+  "fontFamily": "Poppins, Arial, sans-serif",
+  "htmlLabels": false,
+  "deterministicIds": true,
+  "deterministicIDSeed": "konok-knowledge-lessons",
+  "flowchart": {
+    "useMaxWidth": true,
+    "curve": "linear",
+    "nodeSpacing": 42,
+    "rankSpacing": 54,
+    "diagramPadding": 24
+  },
+  "themeVariables": {
+    "primaryColor": "#FFFFFF",
+    "primaryBorderColor": "#141413",
+    "primaryTextColor": "#141413",
+    "lineColor": "#D97757",
+    "secondaryColor": "#FEF1EA",
+    "tertiaryColor": "#F0F4ED",
+    "fontSize": "16px"
+  }
+}

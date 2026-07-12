@@ -1,0 +1,60 @@
+{
+  "id": "github-renderiza-mermaid",
+  "markdownPath": "lessons/2026-07-11 - como-o-github-renderiza-mermaid.md",
+  "htmlPath": "html/como-o-github-renderiza-mermaid.html",
+  "markdown": {
+    "direction": "LR"
+  },
+  "nodes": [
+    {
+      "id": "bloco",
+      "label": "Bloco Markdown com identificador mermaid",
+      "diagramLabel": "Bloco Mermaid",
+      "tone": "coral"
+    },
+    {
+      "id": "github",
+      "label": "Renderizador Markdown do GitHub reconhece o bloco",
+      "diagramLabel": "GitHub reconhece",
+      "tone": "blue"
+    },
+    {
+      "id": "mermaid",
+      "label": "Biblioteca Mermaid interpreta a definição textual",
+      "diagramLabel": "Mermaid interpreta",
+      "tone": "green"
+    },
+    {
+      "id": "visual",
+      "label": "Resultado visual é inserido na página",
+      "diagramLabel": "Diagrama visual",
+      "tone": "ink"
+    },
+    {
+      "id": "leitor",
+      "label": "Leitor vê o fluxo sem editar o código",
+      "diagramLabel": "Leitor vê",
+      "tone": "coral"
+    }
+  ],
+  "edges": [
+    { "from": "bloco", "to": "github" },
+    { "from": "github", "to": "mermaid" },
+    { "from": "mermaid", "to": "visual" },
+    { "from": "visual", "to": "leitor" }
+  ],
+  "html": {
+    "title": "Texto que vira desenho",
+    "overview": {
+      "direction": "LR",
+      "nodes": ["bloco", "github", "mermaid", "visual", "leitor"],
+      "edges": [
+        { "from": "bloco", "to": "github" },
+        { "from": "github", "to": "mermaid" },
+        { "from": "mermaid", "to": "visual" },
+        { "from": "visual", "to": "leitor" }
+      ]
+    },
+    "caption": "O código continua sendo a fonte; a página mostra a representação visual gerada a partir dele."
+  }
+}

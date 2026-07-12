@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Como o Doceo separa memória e publicação a partir da mesma lição.">
+  <title>Como uma lição vira nota Markdown e página HTML</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --paper: #FAF9F5;
+      --ink: #141413;
+      --surface: #FFFFFF;
+      --surface-alt: #F0F4ED;
+      --coral: #D97757;
+      --coral-deep: #C96F51;
+      --blue: #6A9BCC;
+      --green: #788C5D;
+      --peach: #FEF1EA;
+      --line: rgba(20, 20, 19, .16);
+      --muted: #5f625f;
+      --focus: #4A45D2;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #141413;
+        --ink: #FAF9F5;
+        --surface: #22211e;
+        --surface-alt: #263027;
+        --coral: #D97757;
+        --coral-deep: #E49479;
+        --blue: #8EB5D8;
+        --green: #9AAA83;
+        --peach: #4a2d22;
+        --line: rgba(250, 249, 245, .22);
+        --muted: #c9c4bb;
+        --focus: #8EB5D8;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { background: var(--paper); }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 500 1.125rem/1.5 Lora, Georgia, serif;
+    }
+    main {
+      width: min(100%, 1320px);
+      margin: 0 auto;
+      padding: clamp(16px, 3vw, 40px) clamp(16px, 5vw, 80px) 64px;
+    }
+    article { width: 100%; }
+    h1, h2, h3, strong, .kicker, .fact, .step, footer, a, summary {
+      font-family: Poppins, Arial, sans-serif;
+    }
+    h1, h2, h3, p { text-wrap: pretty; }
+    h1 {
+      max-width: 11ch;
+      margin: 0;
+      color: var(--paper);
+      font-size: clamp(3rem, 7vw, 5.8rem);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: .98;
+      text-wrap: balance;
+    }
+    h2 {
+      margin: 0 0 14px;
+      color: var(--ink);
+      font-size: clamp(1.7rem, 3.3vw, 3rem);
+      font-weight: 600;
+      letter-spacing: -.035em;
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+    h3 {
+      margin: 0 0 10px;
+      color: var(--ink);
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+    }
+    p { max-width: 70ch; margin: 0 0 16px; }
+    code {
+      padding: .12em .35em;
+      border-radius: 6px;
+      background: color-mix(in oklab, var(--surface-alt) 84%, var(--ink));
+      font-size: .92em;
+    }
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: clamp(28px, 6vw, 84px);
+      min-height: 430px;
+      overflow: hidden;
+      padding: clamp(32px, 7vw, 88px);
+      background: var(--ink);
+      border-radius: 16px;
+      color: var(--paper);
+      isolation: isolate;
+    }
+    .hero::before {
+      position: absolute;
+      right: -120px;
+      top: -160px;
+      z-index: -1;
+      width: 460px;
+      height: 460px;
+      border: 1px solid rgba(217, 119, 87, .4);
+      border-radius: 50%;
+      content: "";
+    }
+    .hero::after {
+      position: absolute;
+      right: 120px;
+      bottom: -240px;
+      z-index: -1;
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(106, 155, 204, .28);
+      border-radius: 50%;
+      content: "";
+    }
+    .kicker {
+      margin: 0 0 24px;
+      color: var(--coral);
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+    }
+    .hero-copy { display: flex; flex-direction: column; justify-content: flex-end; }
+    .hero-copy .lede {
+      max-width: 44ch;
+      margin-top: 24px;
+      color: rgba(250, 249, 245, .78);
+      font-size: clamp(1.02rem, 1.8vw, 1.25rem);
+    }
+    .hero-side { display: flex; flex-direction: column; justify-content: flex-end; gap: 20px; }
+    .answer {
+      margin: 0;
+      padding: clamp(22px, 3vw, 34px);
+      background: var(--peach);
+      border: 1px solid rgba(201, 111, 81, .34);
+      border-radius: 12px;
+      color: var(--ink);
+      font-family: Poppins, Arial, sans-serif;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .hero-facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid rgba(250, 249, 245, .28);
+      border-bottom: 1px solid rgba(250, 249, 245, .28);
+    }
+    .fact {
+      padding: 14px 12px 12px 0;
+      color: var(--paper);
+      font-size: .78rem;
+      font-weight: 600;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .fact + .fact { padding-left: 12px; border-left: 1px solid rgba(250, 249, 245, .28); }
+    .fact span { display: block; margin-top: 6px; color: rgba(250, 249, 245, .66); font-size: .72rem; font-weight: 500; text-transform: none; }
+    .surface {
+      margin-top: 24px;
+      padding: clamp(24px, 4vw, 56px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .section-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, .7fr);
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+    .section-kicker { margin: 0 0 10px; color: var(--coral-deep); font: 600 .85rem/1 Poppins, Arial, sans-serif; letter-spacing: .02em; }
+    .section-note { justify-self: end; margin: 0; color: var(--muted); font-size: 1rem; }
+    .diagram {
+      margin: 0;
+      padding: clamp(20px, 3vw, 32px);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .diagram-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+    .diagram-head p { max-width: 54ch; margin: 0; color: var(--muted); font-size: 1rem; }
+    .diagram-box {
+      overflow: auto;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .diagram-box svg { display: block; width: 100%; min-width: 980px; height: auto; }
+    .diagram-caption { margin: 16px 0 0; color: var(--muted); font-size: .95rem; }
+    .two-up { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
+    .panel { padding: clamp(24px, 4vw, 48px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .panel.soft { background: var(--surface-alt); }
+    .panel p:last-child { margin-bottom: 0; }
+    .process { margin-top: 24px; padding: clamp(24px, 4vw, 48px); background: var(--ink); border-radius: 16px; color: var(--paper); }
+    .process h2 { color: var(--paper); }
+    .process-head { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 28px; }
+    .process-head p { max-width: 42ch; margin: 0; color: rgba(250, 249, 245, .70); font-size: 1rem; }
+    .process-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; border-top: 1px solid rgba(250, 249, 245, .25); border-bottom: 1px solid rgba(250, 249, 245, .25); }
+    .step { min-height: 170px; padding: 24px 22px 20px 0; color: var(--paper); font-size: 1rem; font-weight: 600; }
+    .step + .step { padding-left: 22px; border-left: 1px solid rgba(250, 249, 245, .25); }
+    .step-index { display: inline-grid; place-items: center; width: 34px; height: 34px; margin-bottom: 28px; border-radius: 50%; background: var(--coral); color: #fff; font-size: .85rem; line-height: 1; }
+    .step:nth-child(2) .step-index { background: var(--blue); }
+    .step:nth-child(3) .step-index { background: var(--green); }
+    .step:nth-child(4) .step-index { background: var(--coral-deep); }
+    .step span:last-child { display: block; margin-top: 8px; color: rgba(250, 249, 245, .66); font-family: Lora, Georgia, serif; font-size: .98rem; font-weight: 500; line-height: 1.45; }
+    .closing { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr); gap: 24px; margin-top: 24px; }
+    details { padding: 16px 0; border-top: 1px solid var(--line); }
+    details:last-of-type { border-bottom: 1px solid var(--line); }
+    summary { cursor: pointer; color: var(--ink); font-size: 1rem; font-weight: 600; }
+    summary:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 5px; border-radius: 3px; }
+    details p { margin: 12px 0 0; color: var(--muted); }
+    .link-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+    .link-list li { border-top: 1px solid var(--line); }
+    .link-list li:last-child { border-bottom: 1px solid var(--line); }
+    a { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; color: var(--coral-deep); font-size: .95rem; font-weight: 600; text-decoration: none; }
+    a::after { content: '↗'; color: var(--coral); }
+    .next-lessons { display: grid; gap: 10px; margin: 0; padding-left: 1.2rem; color: var(--muted); }
+    .next-lessons li::marker { color: var(--coral); }
+    footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 32px; padding: 18px 4px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+    @media (max-width: 960px) {
+      .hero, .section-intro, .closing { grid-template-columns: 1fr; }
+      .section-note { justify-self: start; }
+      .process-head { display: block; }
+      .process-head p { margin-top: 12px; }
+      .diagram-head { display: block; }
+      .diagram-head p { margin-top: 12px; }
+    }
+    @media (max-width: 760px) {
+      main { padding: 12px 12px 40px; }
+      .hero { min-height: 0; padding: 30px 24px; }
+      .hero-facts { grid-template-columns: 1fr; }
+      .fact, .fact + .fact { padding: 12px 0; border-left: 0; }
+      .fact + .fact { border-top: 1px solid rgba(250, 249, 245, .28); }
+      .two-up { grid-template-columns: 1fr; }
+      .process-grid { grid-template-columns: 1fr 1fr; }
+      .step, .step + .step { min-height: 150px; padding: 18px 14px; border-left: 0; }
+      .step:nth-child(n+3) { border-top: 1px solid rgba(250, 249, 245, .25); }
+      footer { display: block; }
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: clamp(2.7rem, 16vw, 4.2rem); }
+      .surface, .panel, .process { padding: 22px 18px; }
+      .process-grid { grid-template-columns: 1fr; }
+      .step, .step + .step, .step:nth-child(n+3) { min-height: 0; border-top: 1px solid rgba(250, 249, 245, .25); }
+      .step:first-child { border-top: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+      .diagram-figure { margin: 0; padding: clamp(20px, 3vw, 36px); background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+    .diagram-kicker { margin: 0 0 8px; color: var(--coral-deep); font: 600 .85rem/1 Poppins, Arial, sans-serif; }
+    .diagram-figure h3 { margin: 0 0 20px; color: var(--ink); font: 600 clamp(1.35rem, 2.5vw, 2rem)/1.08 Poppins, Arial, sans-serif; letter-spacing: -.03em; text-wrap: balance; }
+    .diagram-viewport { max-inline-size: 100%; overflow: auto; padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+    .diagram-viewport > svg { display: block; width: max(100%, 44rem) !important; height: auto !important; overflow: visible; }
+    .diagram-caption { margin: 16px 0 0; color: var(--muted); font: 500 .92rem/1.45 Lora, Georgia, serif; }
+    .diagram-details { margin-top: 18px; border-top: 1px solid var(--line); }
+    .diagram-detail { padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .diagram-detail summary { cursor: pointer; color: var(--ink); font: 600 1rem/1.25 Poppins, Arial, sans-serif; }
+    .diagram-detail summary:focus-visible { outline: 3px solid var(--coral); outline-offset: 4px; }
+    .diagram-detail p { max-width: 68ch; margin: 12px 0 16px; color: var(--muted); }
+    .diagram-detail .diagram-viewport { padding: 10px; background: var(--surface-alt); }
+    .diagram-detail .diagram-viewport > svg { width: max(100%, 36rem) !important; }
+    @media (max-width: 760px) { .diagram-figure { padding: 20px; } .diagram-viewport { margin-inline: -4px; } }
+
+  </style>
+</head>
+<body>
+  <main>
+    <article>
+      <section class="hero" aria-labelledby="titulo">
+        <div class="hero-copy">
+          <p class="kicker">Doceo · publicação editorial</p>
+          <h1 id="titulo">Uma lição vira memória e página.</h1>
+          <p class="lede">O Markdown guarda o que foi aprendido. O HTML organiza isso para leitura, apresentação e compartilhamento.</p>
+        </div>
+        <div class="hero-side">
+          <p class="answer">A mesma lição gera dois artefatos: a nota Markdown para memória e a página HTML para publicação.</p>
+          <div class="hero-facts" aria-label="Funções dos artefatos">
+            <div class="fact">Markdown<span>memória e índice</span></div>
+            <div class="fact">HTML<span>leitura e apresentação</span></div>
+            <div class="fact">Feedback<span>próxima melhoria</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface" aria-labelledby="mapa">
+        <div class="section-intro">
+          <div>
+            <p class="section-kicker">O mapa</p>
+            <h2 id="mapa">Uma fonte, dois artefatos, um ciclo de melhoria.</h2>
+          </div>
+          <p class="section-note">O Doceo não separa forma e memória por acidente. Ele cria uma nota para manter o conhecimento navegável e uma página para torná-lo legível fora do editor.</p>
+        </div>
+
+        <!-- diagram:como-uma-licao-vira-nota-markdown-e-pagina-html:start -->
+<figure class="diagram-figure" data-diagram-id="como-uma-licao-vira-nota-markdown-e-pagina-html">
+<p class="diagram-kicker">O mapa</p>
+<h3>Da lição aos artefatos</h3>
+<div class="diagram-viewport"><svg role="img" aria-label="Da lição aos artefatos" focusable="false" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" viewBox="-16 -16 740.75 196" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg{font-family:Poppins,Arial,sans-serif;font-size:16px;fill:#141413;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .error-icon{fill:#F0F4ED;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .error-text{fill:#141413;stroke:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-thickness-normal{stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-thickness-thick{stroke-width:3.5px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-pattern-solid{stroke-dasharray:0;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-pattern-dashed{stroke-dasharray:3;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edge-pattern-dotted{stroke-dasharray:2;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .marker{fill:#D97757;stroke:#D97757;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .marker.cross{stroke:#D97757;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg svg{font-family:Poppins,Arial,sans-serif;font-size:16px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg p{margin:0;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .label{font-family:Poppins,Arial,sans-serif;color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .cluster-label text{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .cluster-label span{color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .cluster-label span p{background-color:transparent;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .label text,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg span{fill:#141413;color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node circle,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node ellipse,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node polygon,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node path{fill:#FFFFFF;stroke:#141413;stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .rough-node .label text,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node .label text,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .image-shape .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .icon-shape .label{text-anchor:middle;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node .katex path{fill:#141413;stroke:#141413;stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .rough-node .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .image-shape .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .icon-shape .label{text-align:center;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node.clickable{cursor:pointer;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .root .anchor path{fill:#D97757!important;stroke-width:0;stroke:#D97757;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .arrowheadPath{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edgePath .path{stroke:#D97757;stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .flowchart-link{stroke:#D97757;fill:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edgeLabel{background-color:#FEF1EA;text-align:center;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edgeLabel p{background-color:#FEF1EA;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .edgeLabel rect{opacity:0.5;background-color:#FEF1EA;fill:#FEF1EA;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .labelBkg{background-color:rgba(254, 241, 234, 0.5);}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .cluster rect{fill:#F0F4ED;stroke:hsl(94.2857142857, 0%, 84.3137254902%);stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .cluster text{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .cluster span{color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:Poppins,Arial,sans-serif;font-size:12px;background:#F0F4ED;border:1px solid hsl(94.2857142857, 0%, 84.3137254902%);border-radius:3px;pointer-events:none;z-index:100;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg rect.text{fill:none;stroke-width:0;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .icon-shape,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .image-shape{background-color:#FEF1EA;text-align:center;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .icon-shape p,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .image-shape p{background-color:#FEF1EA;padding:2px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .icon-shape .label rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .image-shape .label rect{opacity:0.5;background-color:#FEF1EA;fill:#FEF1EA;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .node .neo-node{stroke:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].node rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].cluster rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].node polygon{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].node path{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-gradient);stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].node .neo-line path{stroke:#141413;filter:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].node circle{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].node circle .state-start{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].icon-shape .icon{fill:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg :root{--mermaid-font-family:Poppins,Arial,sans-serif;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .coral rect{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .coral polygon{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .coral ellipse{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .coral circle{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .coral path{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .coral tspan{fill:rgb(20, 20, 19)!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .blue rect{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .blue polygon{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .blue ellipse{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .blue circle{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .blue path{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .blue tspan{fill:rgb(20, 20, 19)!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .green rect{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .green polygon{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .green ellipse{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .green circle{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .green path{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .green tspan{fill:rgb(20, 20, 19)!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .ink rect{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .ink polygon{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .ink ellipse{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .ink circle{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .ink path{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg .ink tspan{fill:rgb(20, 20, 19)!important;}</style><g><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M144.482,55.5L190.875,34.5L213.875,34.5" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-L_licao_md_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_licao_md_0" data-points="W3sieCI6MTQ0LjQ4MTU3ODk0NzM2ODQsInkiOjU1LjV9LHsieCI6MTkwLjg3NSwieSI6MzQuNX0seyJ4IjoyMTcuODc1LCJ5IjozNC41fV0=" data-look="classic" marker-end="url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointEnd)"/><path d="M144.482,108.5L190.875,129.5L226.362,129.5" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-L_licao_html_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_licao_html_0" data-points="W3sieCI6MTQ0LjQ4MTU3ODk0NzM2ODQsInkiOjEwOC41fSx7IngiOjE5MC44NzUsInkiOjEyOS41fSx7IngiOjIzMC4zNjIwMjIzOTk5MDIzNCwieSI6MTI5LjV9XQ==" data-look="classic" marker-end="url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointEnd)"/><path d="M403.516,34.5L430.516,34.5L477.195,34.5" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-L_md_index_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_md_index_0" data-points="W3sieCI6NDAzLjUxNTYyNSwieSI6MzQuNX0seyJ4Ijo0MzAuNTE1NjI1LCJ5IjozNC41fSx7IngiOjQ4MS4xOTUzMTI1LCJ5IjozNC41fV0=" data-look="classic" marker-end="url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointEnd)"/><path d="M391.029,129.5L430.516,129.5L453.516,129.5" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-L_html_leitura_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_html_leitura_0" data-points="W3sieCI6MzkxLjAyODYwMjYwMDA5NzY2LCJ5IjoxMjkuNX0seyJ4Ijo0MzAuNTE1NjI1LCJ5IjoxMjkuNX0seyJ4Ijo0NTcuNTE1NjI1LCJ5IjoxMjkuNX1d" data-look="classic" marker-end="url(#como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_licao_md_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" style="stroke: none"/></g><g class="edgeLabel"><g class="label" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_licao_html_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" style="stroke: none"/></g><g class="edgeLabel"><g class="label" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_md_index_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" style="stroke: none"/></g><g class="edgeLabel"><g class="label" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-L_html_leitura_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" style="stroke: none"/></g></g><g class="nodes"><g class="node default coral" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-flowchart-licao-0" data-look="classic" transform="translate(85.9375, 82)"><rect class="basic label-container" style="fill:#FEF1EA !important;stroke:#D97757 !important;stroke-width:2px !important" x="-77.9375" y="-26.5" width="155.875" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Lção</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> pronta</tspan></tspan></text></g></g></g><g class="node default blue" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-flowchart-md-1" data-look="classic" transform="translate(310.6953125, 34.5)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#6A9BCC !important;stroke-width:2px !important" x="-92.8203125" y="-26.5" width="185.640625" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Nota</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> Markdown</tspan></tspan></text></g></g></g><g class="node default ink" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-flowchart-html-2" data-look="classic" transform="translate(310.6953125, 129.5)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#141413 !important;stroke-width:2px !important" x="-80.33329010009766" y="-26.5" width="160.6665802001953" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Página</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> HTML</tspan></tspan></text></g></g></g><g class="node default green" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-flowchart-index-3" data-look="classic" transform="translate(579.1328125, 34.5)"><rect class="basic label-container" style="fill:#F0F4ED !important;stroke:#788C5D !important;stroke-width:2px !important" x="-97.9375" y="-26.5" width="195.875" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">index.md</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> /</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> maps</tspan></tspan></text></g></g></g><g class="node default blue" id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-flowchart-leitura-4" data-look="classic" transform="translate(579.1328125, 129.5)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#6A9BCC !important;stroke-width:2px !important" x="-121.6171875" y="-26.5" width="243.234375" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Leitura</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> /</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> apresentação</tspan></tspan></text></g></g></g></g></g></g><defs><filter id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#141413"/></filter></defs><defs><filter id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#141413"/></filter></defs><linearGradient id="como-uma-licao-vira-nota-markdown-e-pagina-html-overview-my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#141413" stop-opacity="1"/><stop offset="100%" stop-color="#FEF1EA" stop-opacity="1"/></linearGradient></svg></div>
+<figcaption class="diagram-caption">A mesma lição gera memória em Markdown e leitura em HTML. O uso da página produz feedback, e o feedback melhora as regras seguintes.</figcaption>
+<div class="diagram-details"><details class="diagram-detail">
+<summary>Como a leitura vira melhoria</summary>
+<p>O feedback nasce do uso da página e atualiza as regras de ensino para a próxima lição.</p>
+<div class="diagram-viewport"><svg role="img" aria-label="Como a leitura vira melhoria" focusable="false" id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" viewBox="-16 -16 714.90771484375 101" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg{font-family:Poppins,Arial,sans-serif;font-size:16px;fill:#141413;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .error-icon{fill:#F0F4ED;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .error-text{fill:#141413;stroke:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-thickness-normal{stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-thickness-thick{stroke-width:3.5px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-pattern-solid{stroke-dasharray:0;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-pattern-dashed{stroke-dasharray:3;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edge-pattern-dotted{stroke-dasharray:2;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .marker{fill:#D97757;stroke:#D97757;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .marker.cross{stroke:#D97757;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg svg{font-family:Poppins,Arial,sans-serif;font-size:16px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg p{margin:0;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .label{font-family:Poppins,Arial,sans-serif;color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .cluster-label text{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .cluster-label span{color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .cluster-label span p{background-color:transparent;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .label text,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg span{fill:#141413;color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node circle,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node ellipse,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node polygon,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node path{fill:#FFFFFF;stroke:#141413;stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .rough-node .label text,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node .label text,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .image-shape .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .icon-shape .label{text-anchor:middle;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node .katex path{fill:#141413;stroke:#141413;stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .rough-node .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .image-shape .label,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .icon-shape .label{text-align:center;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node.clickable{cursor:pointer;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .root .anchor path{fill:#D97757!important;stroke-width:0;stroke:#D97757;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .arrowheadPath{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edgePath .path{stroke:#D97757;stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .flowchart-link{stroke:#D97757;fill:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edgeLabel{background-color:#FEF1EA;text-align:center;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edgeLabel p{background-color:#FEF1EA;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .edgeLabel rect{opacity:0.5;background-color:#FEF1EA;fill:#FEF1EA;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .labelBkg{background-color:rgba(254, 241, 234, 0.5);}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .cluster rect{fill:#F0F4ED;stroke:hsl(94.2857142857, 0%, 84.3137254902%);stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .cluster text{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .cluster span{color:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:Poppins,Arial,sans-serif;font-size:12px;background:#F0F4ED;border:1px solid hsl(94.2857142857, 0%, 84.3137254902%);border-radius:3px;pointer-events:none;z-index:100;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg rect.text{fill:none;stroke-width:0;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .icon-shape,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .image-shape{background-color:#FEF1EA;text-align:center;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .icon-shape p,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .image-shape p{background-color:#FEF1EA;padding:2px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .icon-shape .label rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .image-shape .label rect{opacity:0.5;background-color:#FEF1EA;fill:#FEF1EA;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .node .neo-node{stroke:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].node rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].cluster rect,#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].node polygon{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].node path{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-gradient);stroke-width:1px;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].node .neo-line path{stroke:#141413;filter:none;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].node circle{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].node circle .state-start{fill:#141413;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].icon-shape .icon{fill:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:url(#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg :root{--mermaid-font-family:Poppins,Arial,sans-serif;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .coral rect{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .coral polygon{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .coral ellipse{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .coral circle{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .coral path{fill:rgb(254, 241, 234)!important;stroke:rgb(217, 119, 87)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .coral tspan{fill:rgb(20, 20, 19)!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .blue rect{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .blue polygon{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .blue ellipse{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .blue circle{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .blue path{fill:rgb(255, 255, 255)!important;stroke:rgb(106, 155, 204)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .blue tspan{fill:rgb(20, 20, 19)!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .green rect{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .green polygon{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .green ellipse{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .green circle{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .green path{fill:rgb(240, 244, 237)!important;stroke:rgb(120, 140, 93)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .green tspan{fill:rgb(20, 20, 19)!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .ink rect{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .ink polygon{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .ink ellipse{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .ink circle{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .ink path{fill:rgb(255, 255, 255)!important;stroke:rgb(20, 20, 19)!important;color:rgb(20, 20, 19)!important;stroke-width:2px!important;}#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg .ink tspan{fill:rgb(20, 20, 19)!important;}</style><g><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M251.234,34.5L278.234,34.5L301.234,34.5" id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-L_leitura_feedback_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-L_leitura_feedback_0" data-points="W3sieCI6MjUxLjIzNDM3NSwieSI6MzQuNX0seyJ4IjoyNzguMjM0Mzc1LCJ5IjozNC41fSx7IngiOjMwNS4yMzQzNzUsInkiOjM0LjV9XQ==" data-look="classic" marker-end="url(#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-pointEnd)"/><path d="M444.298,34.5L471.298,34.5L494.298,34.5" id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-L_feedback_learnings_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-L_feedback_learnings_0" data-points="W3sieCI6NDQ0LjI5ODMzOTg0Mzc1LCJ5IjozNC41fSx7IngiOjQ3MS4yOTgzMzk4NDM3NSwieSI6MzQuNX0seyJ4Ijo0OTguMjk4MzM5ODQzNzUsInkiOjM0LjV9XQ==" data-look="classic" marker-end="url(#como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-L_leitura_feedback_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" style="stroke: none"/></g><g class="edgeLabel"><g class="label" data-id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-L_feedback_learnings_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" style="stroke: none"/></g></g><g class="nodes"><g class="node default blue" id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-flowchart-leitura-0" data-look="classic" transform="translate(129.6171875, 34.5)"><rect class="basic label-container" style="fill:#FFFFFF !important;stroke:#6A9BCC !important;stroke-width:2px !important" x="-121.6171875" y="-26.5" width="243.234375" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Leitura</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> /</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> apresentação</tspan></tspan></text></g></g></g><g class="node default coral" id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-flowchart-feedback-1" data-look="classic" transform="translate(374.766357421875, 34.5)"><rect class="basic label-container" style="fill:#FEF1EA !important;stroke:#D97757 !important;stroke-width:2px !important" x="-69.531982421875" y="-26.5" width="139.06396484375" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Feedback</tspan></tspan></text></g></g></g><g class="node default green" id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-flowchart-learnings-2" data-look="classic" transform="translate(586.60302734375, 34.5)"><rect class="basic label-container" style="fill:#F0F4ED !important;stroke:#788C5D !important;stroke-width:2px !important" x="-88.3046875" y="-26.5" width="176.609375" height="53"/><g class="label" style="color:#141413 !important" transform="translate(0, -11.5)"><rect/><g><rect class="background" style="stroke: none"/><text y="-10.1" style="fill:#141413 !important"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">_learnings.md</tspan></tspan></text></g></g></g></g></g></g><defs><filter id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#141413"/></filter></defs><defs><filter id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#141413"/></filter></defs><linearGradient id="como-uma-licao-vira-nota-markdown-e-pagina-html-retorno-my-svg-gradient" gradientUnits="objectBoundingBox" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#141413" stop-opacity="1"/><stop offset="100%" stop-color="#FEF1EA" stop-opacity="1"/></linearGradient></svg></div>
+</details></div>
+</figure>
+<!-- diagram:como-uma-licao-vira-nota-markdown-e-pagina-html:end -->
+      </section>
+
+      <div class="two-up">
+        <section class="panel soft" aria-labelledby="analogia">
+          <p class="section-kicker">Uma comparação útil</p>
+          <h2 id="analogia">Como uma release de produto.</h2>
+          <p>O Markdown funciona como o changelog interno: fica fácil de revisar, linkar e manter. O HTML funciona como a apresentação para cliente ou time: pronto para leitura, com hierarquia e acabamento.</p>
+        </section>
+        <section class="panel" aria-labelledby="encaixe">
+          <p class="section-kicker">Onde entra</p>
+          <h2 id="encaixe">O conhecimento só vira reuso quando fica navegável.</h2>
+          <p>O Doceo transforma cada resposta em memória recuperável. Se a lição não gera uma nota clara e uma página legível, ela continua presa na conversa e não entra no sistema.</p>
+        </section>
+      </div>
+
+      <section class="process" aria-labelledby="funciona">
+        <div class="process-head">
+          <div>
+            <p class="section-kicker">O método</p>
+            <h2 id="funciona">Como a lição ganha forma</h2>
+          </div>
+          <p>O fluxo é curto porque cada saída resolve uma função distinta. Memória, leitura e feedback não precisam competir no mesmo arquivo.</p>
+        </div>
+        <ol class="process-grid">
+          <li class="step"><span class="step-index">1</span>Lição<span>Escreve a ideia central em Markdown.</span></li>
+          <li class="step"><span class="step-index">2</span>Memória<span>Guarda no <code>lessons/</code> e liga no índice.</span></li>
+          <li class="step"><span class="step-index">3</span>Publicação<span>Gera a página HTML para leitura fora do editor.</span></li>
+          <li class="step"><span class="step-index">4</span>Aprendizado<span>Registra o que funcionou para a próxima versão.</span></li>
+        </ol>
+      </section>
+
+      <div class="closing">
+        <section class="panel" aria-labelledby="verifique">
+          <p class="section-kicker">Teste rápido</p>
+          <h2 id="verifique">Verifique se entendeu</h2>
+          <details><summary>Qual artefato guarda a memória?</summary><p>A nota Markdown.</p></details>
+          <details><summary>Qual artefato serve para leitura e apresentação?</summary><p>A página HTML.</p></details>
+          <details><summary>O que fecha o ciclo?</summary><p>O feedback, que melhora a próxima lição e pode virar regra em <code>_learnings.md</code>.</p></details>
+        </section>
+        <section class="panel soft" aria-labelledby="aprofundar">
+          <p class="section-kicker">Continue a trilha</p>
+          <h2 id="aprofundar">Vá além</h2>
+          <ul class="link-list">
+            <li><a href="../lessons/2026-07-11%20-%20o-que-e-o-doceo.md">O que é o Doceo</a></li>
+            <li><a href="../lessons/2026-07-11%20-%20como-o-doceo-usa-o-profile.md">Como o Doceo usa o _profile.md</a></li>
+            <li><a href="../_learnings.md">Regras acumuladas do Doceo</a></li>
+            <li><a href="../docs/checklist-operacional.md">Checklist operacional do Doceo</a></li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="panel" aria-labelledby="proximas">
+        <p class="section-kicker">A seguir</p>
+        <h2 id="proximas">Próximas lições</h2>
+        <ul class="next-lessons">
+          <li>Como o feedback atualiza _learnings.md.</li>
+          <li>Como uma lição é armazenada em OKF.</li>
+          <li>Como o índice conecta lições.</li>
+        </ul>
+      </section>
+
+      <footer><span>Lição 3 · ferramentas-de-conhecimento · doceo</span><span>OKF · pt-BR · acessível</span></footer>
+    </article>
+  </main>
+</body>
+</html>

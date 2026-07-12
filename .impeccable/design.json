@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-11T00:00:00-03:00",
+  "title": "Design System: KonoK Knowledge Lessons",
+  "extensions": {
+    "colorMeta": {
+      "brand-paper": {
+        "role": "neutral",
+        "displayName": "Papel KonoK",
+        "canonical": "#FAF9F5",
+        "tonalRamp": [
+          "#26231F",
+          "#514B43",
+          "#7D7469",
+          "#A79D91",
+          "#C5BDB3",
+          "#DCD6CE",
+          "#EEEAE5",
+          "#FAF9F5"
+        ]
+      },
+      "brand-ink": {
+        "role": "neutral",
+        "displayName": "Tinta KonoK",
+        "canonical": "#141413",
+        "tonalRamp": [
+          "#141413",
+          "#292927",
+          "#454541",
+          "#64635E",
+          "#898780",
+          "#B0AEA7",
+          "#D3D1C9",
+          "#F1F0EB"
+        ]
+      },
+      "brand-white": {
+        "role": "neutral",
+        "displayName": "Branco de superfície",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#242424",
+          "#4A4A4A",
+          "#707070",
+          "#969696",
+          "#BDBDBD",
+          "#D6D6D6",
+          "#EBEBEB",
+          "#FFFFFF"
+        ]
+      },
+      "brand-coral": {
+        "role": "primary",
+        "displayName": "Coral KonoK",
+        "canonical": "#D97757",
+        "tonalRamp": [
+          "#35120A",
+          "#672719",
+          "#963D27",
+          "#B95236",
+          "#D97757",
+          "#E49479",
+          "#F0B6A3",
+          "#F9DED5"
+        ]
+      },
+      "brand-coral-deep": {
+        "role": "primary",
+        "displayName": "Coral profundo",
+        "canonical": "#C96F51",
+        "tonalRamp": [
+          "#32110A",
+          "#5D2417",
+          "#8A3624",
+          "#A94D36",
+          "#C96F51",
+          "#DD9279",
+          "#EDB8A7",
+          "#F8DDD5"
+        ]
+      },
+      "brand-blue": {
+        "role": "secondary",
+        "displayName": "Azul operacional",
+        "canonical": "#6A9BCC",
+        "tonalRamp": [
+          "#101E2D",
+          "#1E3D5A",
+          "#315F87",
+          "#4B7FAE",
+          "#6A9BCC",
+          "#8EB5D8",
+          "#B7D0E5",
+          "#E1ECF5"
+        ]
+      },
+      "brand-green": {
+        "role": "tertiary",
+        "displayName": "Verde de operação",
+        "canonical": "#788C5D",
+        "tonalRamp": [
+          "#1B2113",
+          "#354126",
+          "#4F6239",
+          "#657B4C",
+          "#788C5D",
+          "#9AAA83",
+          "#BEC8AF",
+          "#E5EADD"
+        ]
+      },
+      "brand-peach": {
+        "role": "neutral",
+        "displayName": "Pêssego de resposta",
+        "canonical": "#FEF1EA",
+        "tonalRamp": [
+          "#351A10",
+          "#673725",
+          "#98543B",
+          "#C07154",
+          "#DFA48D",
+          "#EBC3B3",
+          "#F5DCD1",
+          "#FEF1EA"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Poppins Display",
+        "purpose": "Títulos principais e orientação rápida."
+      },
+      "body": {
+        "displayName": "Lora Body",
+        "purpose": "Explicação editorial e leitura contínua."
+      }
+    },
+    "shadows": [
+      {
+        "name": "presentation-low",
+        "value": "0 4px 8px rgba(20, 20, 19, 0.10)",
+        "purpose": "Separação sutil de uma superfície que precisa se destacar."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Mudanças curtas de estado sem coreografia."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "Desabilita movimento não essencial quando solicitado pelo sistema."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Publication Hero",
+      "kind": "custom",
+      "refersTo": "publication-hero",
+      "description": "Abertura de uma lição publicável com título, resposta e resumo do ciclo.",
+      "html": "<section class=\"ds-publication-hero\"><div><p class=\"ds-kicker\">Ferramentas de conhecimento</p><h1>O que é o Doceo?</h1></div><p class=\"ds-answer\">Uma resposta curta e visual.</p></section>",
+      "css": ".ds-publication-hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 64px; padding: 72px; background: #141413; color: #FAF9F5; border-radius: 16px; } .ds-publication-hero h1 { font: 700 clamp(3.4rem, 8vw, 6rem)/.98 Poppins, Arial, sans-serif; letter-spacing: -.04em; } .ds-answer { align-self: end; padding: 28px; background: #FEF1EA; color: #141413; border-radius: 12px; font: 600 1.4rem/1.35 Poppins, Arial, sans-serif; } @media (max-width: 920px) { .ds-publication-hero { grid-template-columns: 1fr; } }"
+    },
+    {
+      "name": "Answer Callout",
+      "kind": "custom",
+      "refersTo": "answer-callout",
+      "description": "Resposta principal da lição, visível antes dos detalhes.",
+      "html": "<p class=\"ds-answer\">A resposta principal aparece aqui.</p>",
+      "css": ".ds-answer { background: #FEF1EA; color: #141413; border-radius: 12px; padding: 18px 20px; font: 600 1.2rem/1.4 Poppins, Arial, sans-serif; }"
+    },
+    {
+      "name": "Lesson Surface",
+      "kind": "card",
+      "refersTo": "lesson-surface",
+      "description": "Superfície editorial principal para leitura da lição.",
+      "html": "<article class=\"ds-surface\"><h1>Uma lição</h1><p>Conteúdo.</p></article>",
+      "css": ".ds-surface { background: #FAF9F5; color: #141413; border: 1px solid #E6E1D9; border-radius: 12px; padding: 32px; max-width: 920px; } .ds-surface h1 { font-family: Poppins, Arial, sans-serif; } .ds-surface p { font: 500 1.125rem/1.5 Lora, Georgia, serif; max-width: 70ch; }"
+    },
+    {
+      "name": "Quiz Disclosure",
+      "kind": "custom",
+      "refersTo": "quiz-disclosure",
+      "description": "Pergunta de verificação com resposta acessível sob demanda.",
+      "html": "<details class=\"ds-quiz\"><summary>Qual é a ideia principal?</summary><p>A resposta aparece aqui.</p></details>",
+      "css": ".ds-quiz { border-top: 1px solid #D8D1C8; padding: 12px 0; color: #141413; } .ds-quiz summary { cursor: pointer; font: 600 .875rem/1.4 Poppins, Arial, sans-serif; } .ds-quiz:focus-within { outline: 2px solid #D97757; outline-offset: 4px; } .ds-quiz p { font: 500 1rem/1.5 Lora, Georgia, serif; }"
+    },
+    {
+      "name": "Diagram Node",
+      "kind": "custom",
+      "refersTo": "diagram-node",
+      "description": "Nó de diagrama que mostra uma etapa ou relação.",
+      "html": "<div class=\"ds-node\" aria-label=\"Etapa atual\">Etapa atual</div>",
+      "css": ".ds-node { background: #FFFFFF; border: 2px solid #D8D1C8; border-radius: 12px; color: #141413; padding: 14px 18px; font: 600 .875rem/1.2 Poppins, Arial, sans-serif; } .ds-node[data-active=\"true\"] { background: #FEF1EA; border-color: #D97757; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Sala de Redação do Conhecimento",
+    "overview": "Cada lição é uma peça editorial pronta para publicação, com a precisão de uma ferramenta técnica. A KonoK fornece a base cromática e tipográfica; a Rockty inspira a linguagem de tecnologia operacional, métricas e estados claros.",
+    "keyCharacteristics": [
+      "Editorial, tecnológico e publicável",
+      "Claro na primeira leitura",
+      "Cor com função",
+      "Movimento discreto"
+    ],
+    "rules": [
+      {
+        "name": "The Sala de Redação Rule",
+        "body": "Toda página precisa ter uma ideia principal que sobreviva fora da conversa que a originou.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Signal Rule",
+        "body": "Use o coral para uma decisão por vez. Se tudo chama atenção, nada orienta.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Poppins guia o leitor; Lora explica.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-by-Default Rule",
+        "body": "Se a hierarquia funciona sem sombra, não adicione sombra.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Faça a resposta aparecer antes da ornamentação.",
+      "Faça cada diagrama explicar uma relação real.",
+      "Faça testar contraste, teclado, zoom e movimento reduzido."
+    ],
+    "donts": [
+      "Não faça um template genérico de SaaS ou dashboard sem contexto.",
+      "Não faça gradientes neon, texto com gradiente ou brilho decorativo.",
+      "Não faça animações que escondem conteúdo ou transformam a leitura em espetáculo."
+    ]
+  }
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Variante experimental que carrega Mermaid no navegador e transforma texto em SVG durante a execução.">
+  <title>Mermaid no navegador</title>
+  <style>
+    :root { color-scheme: light dark; --paper:#FAF9F5; --ink:#141413; --surface:#FFFFFF; --coral:#D97757; --coral-deep:#C96F51; --blue:#6A9BCC; --green:#788C5D; --peach:#FEF1EA; --line:rgba(20,20,19,.16); --muted:#515450; --focus:#4A45D2; }
+    @media (prefers-color-scheme: dark) { :root { --paper:#141413; --ink:#FAF9F5; --surface:#22211e; --coral-deep:#E49479; --blue:#8EB5D8; --green:#9AAA83; --peach:#4a2d22; --line:rgba(250,249,245,.22); --muted:#d3cec4; --focus:#8EB5D8; } }
+    * { box-sizing:border-box; }
+    html { background:var(--paper); }
+    body { margin:0; background:var(--paper); color:var(--ink); font:500 1.08rem/1.5 Lora,Georgia,serif; }
+    main { width:min(100%,1180px); margin:0 auto; padding:clamp(16px,4vw,48px) clamp(16px,5vw,72px) 56px; }
+    h1,h2,h3,strong,.kicker,.label,summary,footer,a,.status { font-family:Poppins,Arial,sans-serif; }
+    h1,h2,h3,p { text-wrap:pretty; }
+    h1 { max-width:11ch; margin:0; color:var(--paper); font:700 clamp(3rem,8vw,5.8rem)/.98 Poppins,Arial,sans-serif; letter-spacing:-.04em; text-wrap:balance; }
+    h2 { margin:0 0 14px; color:var(--ink); font:600 clamp(1.8rem,3.5vw,3rem)/1.05 Poppins,Arial,sans-serif; letter-spacing:-.035em; text-wrap:balance; }
+    p { max-width:70ch; margin:0 0 16px; }
+    a { color:var(--coral-deep); font-weight:600; }
+    a:focus-visible,summary:focus-visible { outline:3px solid var(--focus); outline-offset:4px; }
+    .hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.7fr); gap:clamp(28px,6vw,80px); padding:clamp(30px,6vw,72px); background:var(--ink); border-radius:16px; color:var(--paper); }
+    .kicker,.label { margin:0 0 14px; color:var(--coral); font:600 .82rem/1.1 Poppins,Arial,sans-serif; letter-spacing:.02em; }
+    .answer { align-self:end; padding:20px; background:var(--peach); border-radius:12px; color:var(--ink); }
+    .answer p:last-child { margin:0; font:600 clamp(1.18rem,2.2vw,1.55rem)/1.3 Poppins,Arial,sans-serif; }
+    .lesson { display:grid; gap:36px; padding:clamp(30px,5vw,60px) 0 0; }
+    .section { max-width:76ch; }
+    .diagram-shell { margin:0; padding:clamp(20px,3vw,36px); background:var(--surface); border:1px solid var(--line); border-radius:12px; }
+    .diagram-viewport { max-inline-size:100%; overflow:auto; padding:14px; background:var(--surface); border:1px solid var(--line); border-radius:12px; }
+    .diagram-viewport > svg { display:block; width:max(100%,44rem)!important; height:auto!important; overflow:visible; }
+    pre.mermaid { min-height:72px; margin:0; overflow:auto; font:500 .95rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre; }
+    .status { margin:12px 0 0; color:var(--muted); font-size:.86rem; }
+    .status[data-state="error"] { color:var(--coral-deep); }
+    .steps { display:grid; gap:14px; padding:0; margin:0; list-style:none; }
+    .steps li { padding:16px 0; border-bottom:1px solid var(--line); }
+    .steps strong { display:block; margin-bottom:4px; }
+    details { padding:14px 0; border-bottom:1px solid var(--line); }
+    summary { cursor:pointer; font-weight:600; }
+    details p { margin:12px 0 0; }
+    code { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:.9em; }
+    footer { margin-top:44px; color:var(--muted); font-size:.86rem; }
+    @media (max-width:760px) { .hero { grid-template-columns:1fr; } h1 { max-width:13ch; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; animation-iteration-count:1!important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <article>
+      <header class="hero">
+        <div><p class="kicker">DOCEO · VARIANTE EM RUNTIME</p><h1>Mermaid no navegador</h1></div>
+        <div class="answer"><p class="label">Resposta curta</p><p>O HTML carrega Mermaid via CDN, encontra o bloco <code>pre.mermaid</code> e o substitui por um SVG durante a execução da página.</p></div>
+      </header>
+
+      <div class="lesson">
+        <section class="section">
+          <h2>O mesmo fluxo, agora em runtime</h2>
+          <figure class="diagram-shell">
+            <div class="diagram-viewport">
+              <pre class="mermaid" id="github-mermaid-runtime">flowchart LR
+    bloco["Bloco Mermaid"]
+    github["GitHub reconhece"]
+    mermaid["Mermaid interpreta"]
+    visual["Diagrama visual"]
+    leitor["Leitor vê"]
+    bloco --> github
+    github --> mermaid
+    mermaid --> visual
+    visual --> leitor
+    classDef coral fill:#FEF1EA,stroke:#D97757,color:#141413,stroke-width:2px
+    classDef blue fill:#FFFFFF,stroke:#6A9BCC,color:#141413,stroke-width:2px
+    classDef green fill:#F0F4ED,stroke:#788C5D,color:#141413,stroke-width:2px
+    classDef ink fill:#FFFFFF,stroke:#141413,color:#141413,stroke-width:2px
+    class bloco coral
+    class github blue
+    class mermaid green
+    class visual ink
+    class leitor coral</pre>
+            </div>
+            <p class="status" data-mermaid-status role="status" aria-live="polite">Carregando Mermaid no navegador...</p>
+            <noscript><p class="status">JavaScript precisa estar ativo para desenhar este diagrama.</p></noscript>
+          </figure>
+        </section>
+
+        <section class="section"><h2>Uma analogia</h2><p>É como uma aplicação web que busca um componente quando abre: o HTML chega com a instrução e a biblioteca entra em cena no momento do uso. O desenho não foi empacotado antes, ele nasce na visita.</p></section>
+
+        <section class="section"><h2>Onde isso se encaixa</h2><p>Esta abordagem é boa para playgrounds, documentação interativa e conteúdo que muda depois que a página carrega. Ela também demonstra de forma explícita o que o GitHub faz por trás da experiência visual.</p><p>O custo é depender de rede, JavaScript e de uma versão externa da biblioteca. Para publicação estável ou offline, o SVG gerado na build continua sendo mais previsível.</p></section>
+
+        <section class="section"><h2>Passos essenciais</h2><ol class="steps"><li><strong>1. Inclua um bloco <code>pre.mermaid</code>.</strong>Pronto quando o HTML contém a definição textual.</li><li><strong>2. Importe Mermaid como módulo.</strong>Pronto quando a página consegue carregar a biblioteca a partir da CDN.</li><li><strong>3. Inicialize e execute <code>mermaid.run()</code>.</strong>Pronto quando o texto é substituído por um SVG no DOM.</li></ol></section>
+
+        <section class="section"><h2>Verifique se entendeu</h2><details><summary>O que muda em relação ao SVG estático?</summary><p>O navegador passa a executar Mermaid e gerar o desenho depois que a página é carregada.</p></details><details><summary>Qual é o principal risco dessa alternativa?</summary><p>A página depende da rede, do JavaScript e da disponibilidade da versão carregada da biblioteca.</p></details></section>
+
+        <section class="section"><h2>Vá além</h2><p><a href="https://mermaid.js.org/config/usage.html">Mermaid: uso no navegador</a> · <a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams">GitHub: criando diagramas</a></p></section>
+      </div>
+      <footer>Lesson 5 · ferramentas-de-conhecimento · doceo</footer>
+    </article>
+  </main>
+
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.esm.min.mjs";
+
+    const status = document.querySelector("[data-mermaid-status]");
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#FEF1EA",
+        primaryTextColor: "#141413",
+        primaryBorderColor: "#D97757",
+        lineColor: "#D97757",
+        secondaryColor: "#FFFFFF",
+        tertiaryColor: "#F0F4ED",
+        fontFamily: "Poppins, Arial, sans-serif"
+      },
+      flowchart: { useMaxWidth: false, htmlLabels: false }
+    });
+
+    try {
+      await mermaid.run({ nodes: [document.querySelector("#github-mermaid-runtime")] });
+      status.textContent = "Renderizado no navegador com Mermaid 11.16.0.";
+    } catch (error) {
+      status.dataset.state = "error";
+      status.textContent = "Não foi possível carregar Mermaid. O texto-fonte continua disponível acima.";
+      console.error(error);
+    }
+  </script>
+</body>
+</html>
